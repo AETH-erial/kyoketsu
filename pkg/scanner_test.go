@@ -89,14 +89,14 @@ func TestPortWalk(t *testing.T) {
 			go startTestSever(tc[i].ListenPort[x], t)
 		}
 		got := PortWalk("localhost", tc[i].ScanPort)
-		for k, _ := range tc[i].ListenPort {
+		for k := range tc[i].ListenPort {
 			wg.Done()
 			if !Equal(got, tc[i].ListenPort) {
 				if !tc[i].ShouldFail {
 					t.Errorf("Test '%s' failed! PortWalk didnt detect the test server was listening on: %+v\n", tc[i].Name, tc[i].ListenPort)
 				}
 			}
-			t.Logf("Test '%s' passed! Scanned port: '%v'", tc[i].Name, k)
+			t.Logf("Test '%s' passed! Scanned port: '%v'", tc[i].Name, tc[i].ListenPort[k])
 
 		}
 
