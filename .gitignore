@@ -1,6 +1,6 @@
 coverage.html
 coverage.out
 
-./build/linux/kyoketsu/*
-./build/linux/kyoketsu-web/*
+build/linux/kyoketsu/*
+build/linux/kyoketsu-web/*
 
