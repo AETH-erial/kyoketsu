@@ -1,0 +1,533 @@
+
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+		<title>kyoketsu: Go Coverage Report</title>
+		<style>
+			body {
+				background: black;
+				color: rgb(80, 80, 80);
+			}
+			body, pre, #legend span {
+				font-family: Menlo, monospace;
+				font-weight: bold;
+			}
+			#topbar {
+				background: black;
+				position: fixed;
+				top: 0; left: 0; right: 0;
+				height: 42px;
+				border-bottom: 1px solid rgb(80, 80, 80);
+			}
+			#content {
+				margin-top: 50px;
+			}
+			#nav, #legend {
+				float: left;
+				margin-left: 10px;
+			}
+			#legend {
+				margin-top: 12px;
+			}
+			#nav {
+				margin-top: 10px;
+			}
+			#legend span {
+				margin: 0 5px;
+			}
+			.cov0 { color: rgb(192, 0, 0) }
+.cov1 { color: rgb(128, 128, 128) }
+.cov2 { color: rgb(116, 140, 131) }
+.cov3 { color: rgb(104, 152, 134) }
+.cov4 { color: rgb(92, 164, 137) }
+.cov5 { color: rgb(80, 176, 140) }
+.cov6 { color: rgb(68, 188, 143) }
+.cov7 { color: rgb(56, 200, 146) }
+.cov8 { color: rgb(44, 212, 149) }
+.cov9 { color: rgb(32, 224, 152) }
+.cov10 { color: rgb(20, 236, 155) }
+
+		</style>
+	</head>
+	<body>
+		<div id="topbar">
+			<div id="nav">
+				<select id="files">
+				
+				<option value="file0">git.aetherial.dev/aeth/kyoketsu/cmd/kyoketsu/kyoketsu.go (0.0%)</option>
+				
+				<option value="file1">git.aetherial.dev/aeth/kyoketsu/pkg/local.go (86.7%)</option>
+				
+				<option value="file2">git.aetherial.dev/aeth/kyoketsu/pkg/scanner.go (95.0%)</option>
+				
+				<option value="file3">git.aetherial.dev/aeth/kyoketsu/pkg/storage.go (0.0%)</option>
+				
+				</select>
+			</div>
+			<div id="legend">
+				<span>not tracked</span>
+			
+				<span class="cov0">not covered</span>
+				<span class="cov8">covered</span>
+			
+			</div>
+		</div>
+		<div id="content">
+		
+		<pre class="file" id="file0" style="display: none">/*
+                GNU GENERAL PUBLIC LICENSE
+                Version 3, 29 June 2007
+
+
+kyoketsu, a Client-To-Client Network Enumeration System
+Copyright (C) 2024 Russell Hrubesky, ChiralWorks Software LLC
+
+ Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+*/
+
+package main
+
+import (
+        "flag"
+        "fmt"
+        "log"
+        "net"
+        "os"
+        "strings"
+        "sync"
+
+        kyoketsu "git.aetherial.dev/aeth/kyoketsu/pkg"
+)
+
+var licenseMsg = "\n        http-wokou  Copyright (C) 2024  Russell Hrubesky, ChiralWorks Software LLC\n        This program comes with ABSOLUTELY NO WARRANTY; for details type `http-wokou --license`\n        This is free software, and you are welcome to redistribute it\n        under certain conditions; type `http-wokou --redist` for details.\n\n"
+
+var redistMsg = "\n        This program is free software: you can redistribute it and/or modify\n        it under the terms of the GNU General Public License as published by\n        the Free Software Foundation, either version 3 of the License, or\n        (at your option) any later version.\n\n"
+
+var licenseMsgLong = "\n                GNU GENERAL PUBLIC LICENSE\n                Version 3, 29 June 2007\n        Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;\n        Everyone is permitted to copy and distribute verbatim copies\n        of this license document, but changing it is not allowed.\n\n        http-wokou, An HTTP Proxying framework for bypassing DNS Security\n        Copyright (C) 2024 Russell Hrubesky, ChiralWorks Software LLC\n\n        This program is free software: you can redistribute it and/or modify\n        it under the terms of the GNU General Public License as published by\n        the Free Software Foundation, either version 3 of the License, or\n        (at your option) any later version.\n\n        This program is distributed in the hope that it will be useful,\n        but WITHOUT ANY WARRANTY; without even the implied warranty of\n        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n        GNU General Public License for more details.\n\n        You should have received a copy of the GNU General Public License\n        along with this program.  If not, see &lt;https://www.gnu.org/licenses/&gt;.\n\n"
+
+func main() <span class="cov0" title="0">{
+
+        ip := flag.String("ips", "", "single ip address with CIDR notation to gather info about")
+        licenseInfo := flag.Bool("license", false, "Pass this flag to display license and warantee information.")
+        redistInfo := flag.Bool("redist", false, "Pass this flag to display redistribution information.")
+        flag.Parse()
+
+        if *licenseInfo </span><span class="cov0" title="0">{
+                fmt.Println(licenseMsgLong)
+                os.Exit(0)
+        }</span>
+        <span class="cov0" title="0">if *redistInfo </span><span class="cov0" title="0">{
+                fmt.Println(redistMsg)
+                os.Exit(0)
+        }</span>
+        <span class="cov0" title="0">fmt.Println(licenseMsg)
+        var err error
+        var addr *kyoketsu.IpSubnetMapper
+        addr, err = kyoketsu.GetNetworkAddresses(*ip)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal(err)
+        }</span>
+        <span class="cov0" title="0">var wg sync.WaitGroup
+        for i := range addr.Ipv4s </span><span class="cov0" title="0">{
+                wg.Add(1)
+                go func(target string, wg *sync.WaitGroup) </span><span class="cov0" title="0">{
+                        defer wg.Done()
+                        out := kyoketsu.PortWalk(target, kyoketsu.RetrieveScanDirectives().Pairs)
+                        if len(out.ListeningPorts) &gt; 0 </span><span class="cov0" title="0">{
+                                dns, _ := net.LookupAddr(out.IpAddress)
+                                out.Fqdn = strings.Join(dns, ", ")
+
+                                fmt.Printf("%+v\n", out)
+
+                        }</span>
+
+                }(addr.Ipv4s[i].String(), &amp;wg)
+
+        }
+        <span class="cov0" title="0">wg.Wait()</span>
+}
+</pre>
+		
+		<pre class="file" id="file1" style="display: none">/*
+                GNU GENERAL PUBLIC LICENSE
+                Version 3, 29 June 2007
+
+
+kyoketsu, a Client-To-Client Network Enumeration System
+Copyright (C) 2024 Russell Hrubesky, ChiralWorks Software LLC
+
+ Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+*/
+
+package kyoketsu
+
+import (
+        "fmt"
+        "log"
+        "net"
+        "net/netip"
+        "strconv"
+        "strings"
+)
+
+type NetworkInterfaceNotFound struct{ Passed string }
+
+// Implementing error interface
+func (n *NetworkInterfaceNotFound) Error() string <span class="cov0" title="0">{
+        return fmt.Sprintf("Interface: '%s' not found.", n.Passed)
+}</span>
+
+type IpSubnetMapper struct {
+        Ipv4s       []net.IP `json:"addresses"`
+        NetworkAddr net.IP
+        Current     net.IP
+        Mask        int
+}
+
+/*
+Get the next IPv4 address of the address specified in the 'addr' argument,
+
+        :param addr: the address to get the next address of
+*/
+func getNextAddr(addr string) string <span class="cov8" title="1">{
+        parsed, err := netip.ParseAddr(addr)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("failed while parsing address in getNextAddr() ", err, "\n")
+        }</span>
+        <span class="cov8" title="1">return parsed.Next().String()</span>
+
+}
+
+/*
+get the network address of the ip address in 'addr' with the subnet mask from 'cidr'
+
+            :param addr: the ipv4 address to get the network address of
+                :param cidr: the CIDR notation of the subbet
+*/
+func getNetwork(addr string, cidr int) string <span class="cov8" title="1">{
+        addr = fmt.Sprintf("%s/%v", addr, cidr)
+        ip, net, err := net.ParseCIDR(addr)
+        if err != nil </span><span class="cov0" title="0">{
+                log.Fatal("failed whilst attempting to parse cidr in getNetwork() ", err, "\n")
+        }</span>
+        <span class="cov8" title="1">return ip.Mask(net.Mask).String()</span>
+
+}
+
+/*
+Recursive function to get all of the IPv4 addresses for each IPv4 network that the host is on
+
+             :param ipmap: a pointer to an IpSubnetMapper struct which contains domain details such as
+                               the subnet mask, the original network mask, and the current IP address used in the
+                                           recursive function
+                :param max: This is safety feature to prevent stack overflows, so you can manually set the depth to
+                            call the function
+*/
+func addressRecurse(ipmap *IpSubnetMapper) <span class="cov8" title="1">{
+
+        next := getNextAddr(ipmap.Current.String())
+
+        nextNet := getNetwork(next, ipmap.Mask)
+        currentNet := ipmap.NetworkAddr.String()
+
+        if nextNet != currentNet </span><span class="cov8" title="1">{
+                return
+        }</span>
+        <span class="cov8" title="1">ipmap.Current = net.ParseIP(next)
+
+        ipmap.Ipv4s = append(ipmap.Ipv4s, net.ParseIP(next))
+        addressRecurse(ipmap)</span>
+}
+
+/*
+Get all of the IPv4 addresses in the network that 'addr' belongs to. YOU MUST PASS THE ADDRESS WITH CIDR NOTATION
+i.e. '192.168.50.1/24'
+
+        :param addr: the ipv4 address to use for subnet discovery
+*/
+func GetNetworkAddresses(addr string) (*IpSubnetMapper, error) <span class="cov8" title="1">{
+        ipmap := &amp;IpSubnetMapper{Ipv4s: []net.IP{}}
+
+        ip, net, err := net.ParseCIDR(addr)
+        if err != nil </span><span class="cov8" title="1">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">mask, err := strconv.Atoi(strings.Split(addr, "/")[1])
+        if err != nil </span><span class="cov0" title="0">{
+                return nil, err
+        }</span>
+        <span class="cov8" title="1">ipmap.NetworkAddr = ip.Mask(net.Mask)
+        ipmap.Mask = mask
+        ipmap.Current = ip.Mask(net.Mask)
+        addressRecurse(ipmap)
+
+        return ipmap, nil</span>
+
+}
+</pre>
+		
+		<pre class="file" id="file2" style="display: none">/*
+        GNU GENERAL PUBLIC LICENSE
+        Version 3, 29 June 2007
+
+kyoketsu, a Client-To-Client Network Enumeration System
+Copyright (C) 2024 Russell Hrubesky, ChiralWorks Software LLC
+
+        Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
+        Everyone is permitted to copy and distribute verbatim copies
+        of this license document, but changing it is not allowed.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+*/
+package kyoketsu
+
+import (
+        "fmt"
+        "net"
+        "sync"
+        "time"
+)
+
+var PORT_MAP = map[int]string{
+        22: "ssh", 23: "telnet", 53: "dns", 80: "http", 25: "smtp", 443: "https", 8080: "unknown", 8081: "unknown",
+        //8082: "unknown", 8085: "unknown", 8090: "unknown", 8091: "unknown", 9010: "unknown", 9012: "unknown", 10000: "unknown", 1433: "microsoft_sql",
+        3306: "mysql", 3050: "firebird", 5432: "postgres", 27017: "mongo", 6379: "redis", 8005: "tomcat", 6443: "kubernetes", 853: "dns-tls", 143: "imap",
+        389: "ldap", 445: "smb", 543: "kerberos", 544: "kerberos", 749: "kerberos", 760: "kerberos",
+}
+
+/*
+Need to work with with a database schema in mind, and revolve functionality around that
+*/
+
+type Host struct {
+        Fqdn           string         // The FQDN of the address targeted as per the systems default resolver
+        IpAddress      string         // the IPv4 address (no ipv6 support yet)
+        PingResponse   bool           // boolean value representing if the host responded to ICMP
+        ListeningPorts map[int]string // list of maps depicting a port number -&gt; service name
+}
+
+/*
+Perform a concurrent TCP port dial on a host, either by domain name or IP.
+
+        :param addr: the address of fqdn to scan
+        :param portmap: a key/value pair of port numbers to service names to dial the host with
+*/
+func PortWalk(addr string, portmap map[int]string) *Host <span class="cov8" title="1">{
+        wg := &amp;sync.WaitGroup{}
+        out := []*PortScanResult{}
+
+        for p, s := range portmap </span><span class="cov8" title="1">{
+                wg.Add(1)
+                go func(target string, p int, s string) </span><span class="cov8" title="1">{
+                        defer wg.Done()
+                        out = append(out, singlePortScan(target, p, s))
+                }</span>(addr, p, s)
+        }
+        <span class="cov8" title="1">wg.Wait()
+        host := &amp;Host{IpAddress: addr, ListeningPorts: map[int]string{}}
+        for i := range out </span><span class="cov8" title="1">{
+                if out[i].Listening </span><span class="cov8" title="1">{
+                        host.ListeningPorts[out[i].PortNumber] = out[i].Service
+                }</span>
+
+        }
+        <span class="cov8" title="1">return host</span>
+
+}
+
+type PortScanResult struct {
+        // This is used to represent the results of a port scan against one host
+        PortNumber int    `json:"port_number"` // The port number that was scanned
+        Service    string `json:"service"`     // the name of the service that the port was identified/mapped to
+        Protocol   string `json:"protocol"`    // The IP protocol (TCP/UDP)
+        Listening  bool   `json:"listening"`   // A boolean value that depicts if the service is listening or not
+}
+
+type PortScanDirective struct {
+        // Struct for dependency injecting the dynamic port map used for scans
+        Pairs map[int]string
+}
+
+/*
+Wrapper function to dependency inject the resource for a port -&gt; service name mapping.
+May move to a database, or something.
+*/
+func RetrieveScanDirectives() PortScanDirective <span class="cov0" title="0">{
+        return PortScanDirective{Pairs: PORT_MAP}
+}</span>
+
+/*
+Scans a single host on a single port
+
+        :param addr: the address to dial
+        :param port: the port number to dial
+        :param svcs: the name of the service that the port is associate with
+*/
+func singlePortScan(addr string, port int, svcs string) *PortScanResult <span class="cov8" title="1">{
+        address := fmt.Sprintf("%v:%d", addr, port)
+        conn, err := net.DialTimeout("tcp", address, 5*time.Second)
+        if err != nil </span><span class="cov8" title="1">{
+                return &amp;PortScanResult{PortNumber: port, Protocol: "tcp", Service: svcs, Listening: false}
+        }</span>
+        <span class="cov8" title="1">conn.Close()
+        return &amp;PortScanResult{PortNumber: port, Protocol: "tcp", Service: svcs, Listening: true}</span>
+}
+</pre>
+		
+		<pre class="file" id="file3" style="display: none">/*
+                GNU GENERAL PUBLIC LICENSE
+                Version 3, 29 June 2007
+
+
+kyoketsu, a Client-To-Client Network Enumeration System
+Copyright (C) 2024 Russell Hrubesky, ChiralWorks Software LLC
+
+ Copyright (C) 2007 Free Software Foundation, Inc. &lt;https://fsf.org/&gt;
+ Everyone is permitted to copy and distribute verbatim copies
+ of this license document, but changing it is not allowed.
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License,
+or (at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program. If not, see &lt;http://www.gnu.org/licenses/&gt;.
+
+*/
+
+package kyoketsu
+
+import (
+        "context"
+        "fmt"
+        "time"
+
+        "go.mongodb.org/mongo-driver/mongo"
+        "go.mongodb.org/mongo-driver/mongo/options"
+)
+
+type TopologyDatabaseIO interface {
+        /*
+                        This interface defines the Input and output methods that will be necessary
+                    for an appropriate implementation of the data storage that the distributed system will use.
+                    When I get around to implementing the client-to-client format of this, it could be anything.
+        */
+        AddHostToDb(*Host) error             // Add a host to the hosts table
+        UpdateHostEntry(string, *Host) error //Update a host entry, indexing by its ip address
+        RemoveHostEntry(string) error        // Remove a host from the database
+}
+
+type MongoClient struct {
+        conn *mongo.Client
+}
+
+func NewMongoClient(host string, port int) *MongoClient <span class="cov0" title="0">{
+
+        ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+        defer cancel()
+        client, err := mongo.Connect(ctx, options.Client().ApplyURI(fmt.Sprintf("mongodb://%s:%v", host, port)))
+        defer func() </span><span class="cov0" title="0">{
+                if err = client.Disconnect(ctx); err != nil </span><span class="cov0" title="0">{
+                        panic(err)</span>
+                }
+        }()
+        <span class="cov0" title="0">return &amp;MongoClient{conn: client}</span>
+}
+
+func (m *MongoClient) addDocument(id string, data interface{}) error <span class="cov0" title="0">{
+        return nil
+}</span>
+
+func (m *MongoClient) AddHostToDb(host *Host) error <span class="cov0" title="0">{
+        return nil
+}</span>
+
+func (m *MongoClient) UpdateHostEntry(id string, host *Host) error <span class="cov0" title="0">{
+        return nil
+}</span>
+
+func (m *MongoClient) RemoveHostEntry(id string) error <span class="cov0" title="0">{
+        return nil
+}</span>
+</pre>
+		
+		</div>
+	</body>
+	<script>
+	(function() {
+		var files = document.getElementById('files');
+		var visible;
+		files.addEventListener('change', onChange, false);
+		function select(part) {
+			if (visible)
+				visible.style.display = 'none';
+			visible = document.getElementById(part);
+			if (!visible)
+				return;
+			files.value = part;
+			visible.style.display = 'block';
+			location.hash = part;
+		}
+		function onChange() {
+			select(files.value);
+			window.scrollTo(0, 0);
+		}
+		if (location.hash != "") {
+			select(location.hash.substr(1));
+		}
+		if (!visible) {
+			select("file0");
+		}
+	})();
+	</script>
+</html>

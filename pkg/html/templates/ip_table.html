@@ -1,0 +1,8 @@
+{{ define "ip_table.html" }}
+<tr>
+<th scope="row"><p style="font-family: monospace;">{{ .Fqdn }}</p></th>
+        <td><p style="font-family: monospace;">{{ .IpAddress }}</p></td>
+        <td><p style="font-family: monospace;">{{ .PingResponse }}</p></td>
+        <td><p style="font-family: monospace;">{{ .PortString }}</p></td>
+</tr>
+        {{ end }}

@@ -1,0 +1,60 @@
+{{ define "home.html" }}
+<!DOCTYPE html>
+    <head>
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8">
+        <link rel="stylesheet" href="/static/bootstrap-5.0.2-dist/css/bootstrap.min.css">
+    </head>
+
+    <body style="background-color: black;">
+        <div class="container-fluid sticky-top pb-0" style="background-color: black; opacity: 0.5;">
+            <div class="row align-items-center justify-content-center h-100 shadow-lg p-0 mb-0 rounded">
+                <div class="col-sm-8 p-3">
+                    <div style="color: rgba(35, 207, 0, 0.87); font-size: xx-large; font-family: monospace; opacity: 1;">
+                        <a href="/home" style="color: rgba(35, 207, 0, 0.87)">// Kyoketsu</a>
+                    </div>
+                </div>
+                <div class="col-sm-8 p-3">
+                    <form method="post"
+                          hx-target="#response-div"
+                          hx-post="/refresh"
+                          hx-ext="json-enc">
+                          <input type="text" name="ip_address" placeholder="192.168.50.1/24" required>
+                          <button type="submit">send</button>
+                    </form>
+
+
+                </div>
+            </div>
+        </div>
+
+        <table class="table table-dark table-bordered table-hover table-">
+            <thead>
+                <tr>
+                    <th scope="col"><p style="font-family: monospace;">FQDN</p></th>
+                    <th scope="col"><p style="font-family: monospace;">IPv4 Address</p></th>
+                    <th scope="col"><p style="font-family: monospace;">Ping Response?</p></th>
+                    <th scope="col"><p style="font-family: monospace;">Listening Ports</p></th>
+                </tr>
+            </thead>
+            <tbody id="response-div">
+        {{ range . }}
+        <tr>
+            {{ template "ip_table.html" . }}
+        </tr>
+        {{ end }}
+
+
+            </tbody>
+        </table>
+
+    
+    
+        <script src="/static/htmx.min.js"></script>
+        <script src="/static/json-enc.js"></script>
+
+    </body>
+
+
+
+</html>
+{{ end }}
